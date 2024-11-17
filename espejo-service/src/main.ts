@@ -1,17 +1,18 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { Transport } from '@nestjs/microservices';
+import { EspejoProductoModule } from './espejo-producto/espejo-producto.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.createMicroservice(EspejoProductoModule, {
+    transport: Transport.RMQ,
+    options: {
+      urls: ['amqp://localhost:5672'],
+      queue: 'productos', 
+      queueOptions: { durable: false },
+    },
+  });
 
-  const corsOptions: CorsOptions = {
-    origin: 'http://localhost:4200',
-    credentials: true,
-  };
-
-  app.enableCors(corsOptions);
-
-  await app.listen(3001);
+  await app.listen();
+  console.log('Microservicio espejo escuchando en RabbitMQ');
 }
 bootstrap();
