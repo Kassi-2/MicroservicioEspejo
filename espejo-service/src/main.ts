@@ -1,18 +1,23 @@
 import { NestFactory } from '@nestjs/core';
-import { Transport } from '@nestjs/microservices';
-import { EspejoProductoModule } from './espejo-producto/espejo-producto.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { EspejoProductoModule } from './producto/producto.module';
+import { Logger } from '@nestjs/common';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice(EspejoProductoModule, {
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://localhost:5672'],
-      queue: 'productos', 
-      queueOptions: { durable: false },
+  const logger = new Logger('Productos2');
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.TCP,
+      options: {
+        port: 3010,
+      },
     },
-  });
+  );
+
 
   await app.listen();
-  console.log('Microservicio espejo escuchando en RabbitMQ');
+  logger.log(`Puerto 3010`);
 }
 bootstrap();
