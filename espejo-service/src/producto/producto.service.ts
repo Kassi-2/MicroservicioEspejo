@@ -11,26 +11,21 @@ export class EspejoProductoService extends PrismaClient implements OnModuleInit{
     this.logger.log('Database connected 2');
   }
 
+//mayúsculas
+async crear(crearProductoDto: CrearProductoDto) {
+  const productoCreado = await this.productos.create({
+    data: {
+      nombre: crearProductoDto.nombre.toUpperCase(),
+      descripcion: crearProductoDto.descripcion.toUpperCase(), 
+      precio: crearProductoDto.precio,
+    },
+  });
 
-
-  // Método para agregar un producto (en mayúsculas)
-  async crear(crearProductoDto: CrearProductoDto) {
-    const productoEnMayusculas = Object.keys(crearProductoDto).reduce((acc, key) => {
-      acc[key] = typeof crearProductoDto[key] === 'string'
-        ? crearProductoDto[key].toUpperCase()
-        : crearProductoDto[key];
-      return acc;
-    }, {} as CrearProductoDto);
-
-    const producto = await this.productos.create({
-      data: productoEnMayusculas,
-    });
-  
-    return producto;
-  }
+  return productoCreado;
+}
 
   async findAll() {
-    const productos = await this.productos.findMany(); // Asegúrate de usar la conexión correcta
+    const productos = await this.productos.findMany(); 
     console.log('Productos obtenidos desde el espejo:', productos);
     return productos;
   }
